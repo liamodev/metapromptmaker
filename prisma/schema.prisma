@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  ipHash        String?  // sha256(ip + salt), optional
+  userAgent     String?
+  events        Event[]
+  promptRecords PromptRecord[]
+}
+
+model PromptRecord {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  sessionId     String?
+  session       Session? @relation(fields: [sessionId], references: [id])
+
+  rawPrompt     String   // user input
+  packKey       String?  // e.g., "linkedin_post"
+  clarifiers    Json     // array of Q objects served to user
+  clarifierAnswers Json  // user answers
+  optimizedPrompt String // final prompt text
+
+  ranOpenAI     Boolean  @default(false)
+  ranAnthropic  Boolean  @default(false)
+  ranGoogle     Boolean  @default(false)
+
+  resultOpenAI  String?  // model output text
+  resultAnthropic String?
+  resultGoogle  String?
+
+  metrics       Json?    // timings, tokens, selections
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  at        DateTime @default(now())
+  sessionId String?
+  session   Session? @relation(fields: [sessionId], references: [id])
+  kind      String   // page_view, optimize_click, clarifiers_rendered, finalize_click, run_models
+  data      Json?
+}
