@@ -22,7 +22,7 @@ export function PackSelector({ value, onValueChange, disabled = false }: PackSel
         <SelectValue placeholder="Select a use-case pack..." />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="">None</SelectItem>
+        <SelectItem value="none">None</SelectItem>
         {USE_CASE_PACKS.map((pack) => (
           <SelectItem key={pack.key} value={pack.key}>
             <div>

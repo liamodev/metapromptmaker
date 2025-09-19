@@ -41,24 +41,29 @@ export default function HomePage() {
 
   // Generate session ID on mount
   useEffect(() => {
-    setSessionId(`session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+    const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setSessionId(newSessionId);
     
-    // Log page view
+    // Log page view (optional - don't block if it fails)
     fetch('/api/analytics', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        sessionId,
+        sessionId: newSessionId,
         kind: 'page_view',
         data: { page: 'home' }
       })
-    }).catch(console.error);
+    }).catch(error => {
+      console.warn('Analytics logging failed:', error);
+      // Don't block the app if analytics fails
+    });
   }, []);
 
   const handleOptimize = async (prompt: string, selectedPack?: string) => {
     setIsOptimizing(true);
     setRawPrompt(prompt);
-    setPackKey(selectedPack);
+    const actualPackKey = selectedPack === 'none' ? undefined : selectedPack;
+    setPackKey(actualPackKey);
 
     try {
       const response = await fetch('/api/optimize', {
@@ -66,7 +71,7 @@ export default function HomePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           rawPrompt: prompt,
-          packKey: selectedPack,
+          packKey: actualPackKey,
           sessionId,
         }),
       });
@@ -97,7 +102,7 @@ export default function HomePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           rawPrompt,
-          packKey,
+          packKey: packKey === 'none' ? undefined : packKey,
           clarifiers,
           clarifierAnswers: answers,
           sessionId,

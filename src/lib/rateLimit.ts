@@ -21,7 +21,7 @@ export async function rateLimit(config: RateLimitConfig): Promise<RateLimitResul
   const { windowMs, maxRequests } = config;
   
   // Get client IP
-  const headersList = headers();
+  const headersList = await headers();
   const forwarded = headersList.get('x-forwarded-for');
   const ip = forwarded ? forwarded.split(',')[0] : headersList.get('x-real-ip') || 'unknown';
   

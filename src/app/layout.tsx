@@ -12,7 +12,11 @@ export const metadata: Metadata = {
   description: "Turn rough ideas into precise prompts—built for investment teams. Let AI ask you the right questions to create optimized, copy-ready prompts.",
   keywords: ["AI", "prompts", "investment", "finance", "meta-prompting", "GPT", "Claude", "Gemini"],
   authors: [{ name: "Altitude Global Advisors" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({

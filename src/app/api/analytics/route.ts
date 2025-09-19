@@ -13,10 +13,20 @@ const AnalyticsSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { sessionId, kind, data } = AnalyticsSchema.parse(body);
+    console.log('Analytics request body:', body);
+    
+    // Validate the request body
+    if (!body.sessionId || !body.kind) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+    
+    const { sessionId, kind, data } = body;
 
     // Get IP for hashing (optional)
-    const headersList = headers();
+    const headersList = await headers();
     const forwarded = headersList.get('x-forwarded-for');
     const ip = forwarded ? forwarded.split(',')[0] : headersList.get('x-real-ip') || 'unknown';
     
@@ -50,13 +60,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Analytics API error:', error);
-    
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid request data' },
-        { status: 400 }
-      );
-    }
     
     return NextResponse.json(
       { success: false, error: 'Failed to log analytics' },

@@ -14,12 +14,12 @@ interface PromptFormProps {
 
 export function PromptForm({ onOptimize, isLoading = false }: PromptFormProps) {
   const [rawPrompt, setRawPrompt] = useState('');
-  const [selectedPack, setSelectedPack] = useState<string>('');
+  const [selectedPack, setSelectedPack] = useState<string>('none');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (rawPrompt.trim()) {
-      onOptimize(rawPrompt.trim(), selectedPack || undefined);
+      onOptimize(rawPrompt.trim(), selectedPack === 'none' ? undefined : selectedPack);
     }
   };
 
